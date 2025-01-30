@@ -4,3 +4,6 @@ time="2025-01-30T01:18:09-03:00" level=info msg="Start application ScheduleApiGo
 time="2025-01-30T01:18:09-03:00" level=info msg="Start Swagger."
 time="2025-01-30T01:23:45-03:00" level=info msg="Start application ScheduleApiGo"
 time="2025-01-30T01:23:45-03:00" level=info msg="Start Swagger."
+time="2025-01-30T08:26:42-03:00" level=info msg="Start application ScheduleApiGo"
+time="2025-01-30T08:26:42-03:00" level=info msg="Start Swagger."
+time="2025-01-30T08:27:53-03:00" level=error

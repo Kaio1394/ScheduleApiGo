@@ -30,6 +30,8 @@ func main() {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	routes.RegisterPublishJobRoute(r)
+	routes.RegisterAuthRoutes(r)
+
 	r.Run(":" + configs.Port)
 }
 
