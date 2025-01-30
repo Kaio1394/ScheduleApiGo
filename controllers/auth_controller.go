@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"ScheduleApiGo/auth"
 	"ScheduleApiGo/logger"
+	"ScheduleApiGo/service"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,13 +14,25 @@ func Auth(c *gin.Context) {
 	user := c.GetHeader("user")
 	userId := c.GetHeader("userId")
 
-	token, err := auth.GenerateJWT(userId, user)
-	if err != nil {
-		logger.Log.Error("Erro to generate token: " + err.Error())
+	if user == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "User is required"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
+	if userId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "UserId is required"})
+		return
+	}
+	token, err := service.GenerateJWT(userId, user)
+	if err != nil {
+		logger.Log.Error("Erro to generate token: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{
+		"user":      user,
 		"jwt_token": token,
+		"createAt":  time.Now().Format(time.RFC3339),
 	})
-
 }

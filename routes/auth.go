@@ -7,5 +7,5 @@ import (
 )
 
 func RegisterAuthRoutes(r *gin.Engine) {
-	r.POST("/token", controllers.Auth)
+	r.POST("/auth", controllers.Auth)
 }
