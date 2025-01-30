@@ -3,6 +3,7 @@ package config
 type Config struct {
 	App App
 	Server
+	DataBase
 }
 type App struct {
 	Name string
@@ -11,4 +12,8 @@ type App struct {
 type Server struct {
 	Host string
 	Port string
+}
+
+type DataBase struct {
+	StringConnection string
 }

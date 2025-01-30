@@ -4,3 +4,6 @@ app:
 server:
   host: localhost
   port: 8080
+
+dataBase:
+  stringConnection: "Server=localhost\\sqlexpress;Database=ScheduleApiDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"

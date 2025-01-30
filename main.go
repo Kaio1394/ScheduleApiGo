@@ -3,12 +3,20 @@ package main
 import (
 	"ScheduleApiGo/config"
 	"ScheduleApiGo/logger"
-	"net/http"
+	"ScheduleApiGo/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title ScheduleApiGo
+// @version 1.0
+// @description This is a sample API to demonstrate Swagger with Gin.
+// @host localhost:8080
+// @BasePath /
 func main() {
 	configs, err := configSet()
 	if err != nil {
@@ -17,11 +25,11 @@ func main() {
 	}
 	logger.Log.Info("Start application " + configs.App.Name)
 	r := gin.Default()
-	r.GET("/job", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"Message": "Teste",
-		})
-	})
+	logger.Log.Info("Start Swagger.")
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	routes.RegisterPublishJobRoute(r)
 	r.Run(":" + configs.Port)
 }
 
