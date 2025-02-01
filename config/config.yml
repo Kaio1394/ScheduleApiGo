@@ -6,4 +6,5 @@ server:
   port: 8080
 
 dataBase:
-  stringConnection: "Server=localhost\\sqlexpress;Database=ScheduleApiDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+  typeDatabase: "postgres"   
+  stringConnection: "host=localhost user=postgres password=Jkym139413$ dbname=ScheduleDb sslmode=disable"

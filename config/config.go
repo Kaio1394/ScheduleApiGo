@@ -15,5 +15,6 @@ type Server struct {
 }
 
 type DataBase struct {
+	TypeDatabase     string
 	StringConnection string
 }

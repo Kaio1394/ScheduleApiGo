@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ScheduleApiGo/database"
 	"ScheduleApiGo/logger"
 	"ScheduleApiGo/routes"
 	"ScheduleApiGo/viper"
@@ -17,6 +18,12 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
+
+	db := database.ConnectDatabase()
+	var currentDB string
+	db.Raw("SELECT current_database()").Scan(&currentDB)
+	logger.Log.Info("Connected to database: " + currentDB)
+
 	configs, err := viper.ConfigSet()
 	if err != nil {
 		logger.Log.Error("Error when trying to load configuration file: " + err.Error())
@@ -30,6 +37,8 @@ func main() {
 
 	routes.RegisterPublishJobRoute(r)
 	routes.RegisterAuthRoutes(r)
+	routes.RegisterServerRoute(r, db)
+	routes.RegisterJobRoutes(r, db)
 
 	r.Run(":" + configs.Port)
 }
