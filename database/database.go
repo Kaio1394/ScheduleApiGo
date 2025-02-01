@@ -1,18 +1,19 @@
 package database
 
 import (
+	"ScheduleApiGo/logger"
+	"ScheduleApiGo/model"
 	"ScheduleApiGo/viper"
-	"fmt"
-	"log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func ConnectDatabase() *gorm.DB {
+func ConnectDatabase() (*gorm.DB, error) {
 	configs, err := viper.ConfigSet()
 	if err != nil {
-		log.Fatalf("Fail to load configurations: %v", err)
+		logger.Log.Error("Fail to load configurations: %v", err)
+		return nil, err
 	}
 
 	connString := configs.DataBase.StringConnection
@@ -23,14 +24,20 @@ func ConnectDatabase() *gorm.DB {
 	case "postgres":
 		db, err = gorm.Open(postgres.Open(connString), &gorm.Config{})
 	default:
-		log.Fatalf("Database not supported: %s", typeDatabase)
+		logger.Log.Error("Database not supported: %s", typeDatabase)
+		return nil, err
 	}
 
 	if err != nil {
-		log.Fatalf("Fail to connect to database: %v", err)
+		logger.Log.Error("Fail to connect to database: %v", err)
+		return nil, err
 	}
 
-	fmt.Println("Connection with database successful!")
+	if err := db.AutoMigrate(&model.Job{}, &model.Server{}); err != nil {
+		logger.Log.Error("Error running migration: ", err)
+	}
 
-	return db
+	logger.Log.Info("Connection with database successful!")
+
+	return db, nil
 }

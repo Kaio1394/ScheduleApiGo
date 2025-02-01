@@ -19,7 +19,10 @@ import (
 // @BasePath /
 func main() {
 
-	db := database.ConnectDatabase()
+	db, err := database.ConnectDatabase()
+	if err != nil {
+		return
+	}
 	var currentDB string
 	db.Raw("SELECT current_database()").Scan(&currentDB)
 	logger.Log.Info("Connected to database: " + currentDB)

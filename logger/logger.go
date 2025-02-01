@@ -2,6 +2,7 @@ package logger
 
 import (
 	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -11,7 +12,9 @@ var Log *logrus.Logger
 func init() {
 	Log = logrus.New()
 
-	logFile, err := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logFileName := "logs/app_" + time.Now().Format("2006-01-02_15") + ".log"
+
+	logFile, err := os.OpenFile(logFileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		Log.Fatal("Erro in creating log file: ", err)
 	}
