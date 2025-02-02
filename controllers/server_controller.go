@@ -1,19 +1,18 @@
 package controllers
 
 import (
-	"ScheduleApiGo/repository"
+	"ScheduleApiGo/service"
 	"context"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type ServerController struct {
-	repo *repository.ServerRepository
+	service *service.ServerService
 }
 
-func NewServerController(repo *repository.ServerRepository) *ServerController {
-	return &ServerController{repo: repo}
+func NewServerController(service *service.ServerService) *ServerController {
+	return &ServerController{service: service}
 }
 
 func (sc *ServerController) CreateServer(c *gin.Context) {
@@ -27,9 +26,9 @@ func (sc *ServerController) CreateServer(c *gin.Context) {
 		return
 	}
 
-	id, err := sc.repo.Create(context.Background(), request.Tag, request.IP)
+	id, err := sc.service.CreateServer(context.Background(), request.Tag, request.IP)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Fail to insert data.", "message": "" + err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Fail to insert data.", "message": err.Error()})
 		return
 	}
 
