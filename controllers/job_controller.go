@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"ScheduleApiGo/model"
-	"ScheduleApiGo/repository"
+	"ScheduleApiGo/service"
 	"context"
 	"net/http"
 
@@ -10,11 +10,11 @@ import (
 )
 
 type JobController struct {
-	repo *repository.JobRepository
+	service *service.JobService
 }
 
-func NewJobController(repo *repository.JobRepository) *JobController {
-	return &JobController{repo: repo}
+func NewJobController(service *service.JobService) *JobController {
+	return &JobController{service: service}
 }
 
 func (jc *JobController) CreateJob(c *gin.Context) {
@@ -22,9 +22,10 @@ func (jc *JobController) CreateJob(c *gin.Context) {
 		Name        string `json:"name" binding:"required"`
 		Description string `json:"description"`
 		CmdExecute  bool   `json:"cmdExecute"`
-		Script      string `json:"script"` // Alterado para string
+		Script      string `json:"script"`
 		Date        string `json:"date"`
 		Hold        bool   `json:"hold"`
+		Priority    int    `json:"priority"`
 		ServerId    int    `json:"serverId" binding:"required"`
 	}
 
@@ -37,13 +38,14 @@ func (jc *JobController) CreateJob(c *gin.Context) {
 		Name:        request.Name,
 		Description: request.Description,
 		CmdExecute:  request.CmdExecute,
-		Script:      request.Script, // Agora pode ser uma string
+		Script:      request.Script,
 		Date:        request.Date,
 		Hold:        request.Hold,
 		ServerId:    request.ServerId,
+		Priority:    request.Priority,
 	}
 
-	id, err := jc.repo.Create(context.Background(), &job)
+	id, err := jc.service.CreateJob(context.Background(), &job)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Fail to insert data.", "message": err.Error()})
 		return
