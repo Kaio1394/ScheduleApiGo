@@ -54,6 +54,12 @@ func (jc *JobController) CreateJob(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
-func ListJob(c *gin.Context) {
+func (jc *JobController) GetJobs(c *gin.Context) {
+	jobs, err := jc.service.GetJobs(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch jobs", "message": err.Error()})
+		return
+	}
 
+	c.JSON(http.StatusOK, gin.H{"jobs": jobs})
 }

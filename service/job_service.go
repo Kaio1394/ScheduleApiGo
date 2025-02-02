@@ -4,7 +4,6 @@ import (
 	"ScheduleApiGo/model"
 	"ScheduleApiGo/repository"
 	"context"
-	"errors"
 )
 
 type JobService struct {
@@ -16,14 +15,9 @@ func NewJobService(repo *repository.JobRepository) *JobService {
 }
 
 func (s *JobService) CreateJob(ctx context.Context, job *model.Job) (int, error) {
-	if job.Name == "" || job.ServerId == 0 {
-		return 0, errors.New("Job name and ServerId are required")
-	}
+	return s.repo.Create(ctx, job)
+}
 
-	jobID, err := s.repo.Create(ctx, job)
-	if err != nil {
-		return 0, err
-	}
-
-	return jobID, nil
+func (s *JobService) GetJobs(ctx context.Context) ([]model.Job, error) {
+	return s.repo.GetJobs(ctx)
 }
