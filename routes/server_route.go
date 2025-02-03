@@ -2,7 +2,7 @@ package routes
 
 import (
 	"ScheduleApiGo/controllers"
-	"ScheduleApiGo/repository"
+	"ScheduleApiGo/repository/server"
 	"ScheduleApiGo/service"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +10,7 @@ import (
 )
 
 func RegisterServerRoute(r *gin.Engine, db *gorm.DB) {
-	serverRepo := repository.NewServerRepository(db)
+	serverRepo := server.NewServerRepository(db)
 	serverService := service.NewServerService(serverRepo)
 	serverController := controllers.NewServerController(serverService)
 

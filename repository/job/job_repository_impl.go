@@ -1,4 +1,4 @@
-package repository
+package job
 
 import (
 	"ScheduleApiGo/logger"
@@ -8,15 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type JobRepository struct {
+type JobRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewJobRepository(db *gorm.DB) *JobRepository {
-	return &JobRepository{db: db}
+func NewJobRepository(db *gorm.DB) *JobRepositoryImpl {
+	return &JobRepositoryImpl{db: db}
 }
 
-func (r *JobRepository) Create(ctx context.Context, job *model.Job) (int, error) {
+func (r *JobRepositoryImpl) Create(ctx context.Context, job *model.Job) (int, error) {
 	if err := r.db.WithContext(ctx).Create(&job).Error; err != nil {
 		logger.Log.Error("Error to insert a new server: " + err.Error())
 		return 0, err
@@ -24,7 +24,7 @@ func (r *JobRepository) Create(ctx context.Context, job *model.Job) (int, error)
 	return job.Id, nil
 }
 
-func (r *JobRepository) GetJobs(ctx context.Context) ([]model.Job, error) {
+func (r *JobRepositoryImpl) GetJobs(ctx context.Context) ([]model.Job, error) {
 	var jobs []model.Job
 	if err := r.db.WithContext(ctx).Find(&jobs).Error; err != nil {
 		logger.Log.Error("Error fetching jobs: " + err.Error())
