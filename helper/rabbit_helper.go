@@ -12,14 +12,6 @@ import (
 
 var queue_history string = "Job.Schedule.History"
 
-type IRabbit interface {
-	TestConnection() (bool, error)
-	HasEmptyParams() bool
-	SendMessage(message interface{}, queue string, con *amqp.Connection) bool
-	GetStringConnection() string
-	Connection() (*amqp.Connection, error)
-}
-
 type Rabbit struct {
 	User     string
 	Password string
@@ -27,11 +19,11 @@ type Rabbit struct {
 	Port     uint32
 }
 
-func (r Rabbit) HasEmptyParams() bool {
+func (r *Rabbit) HasEmptyParams() bool {
 	return r.User == "" || r.Password == "" || r.Host == "" || r.Port == 0
 }
 
-func (r Rabbit) Connection() (*amqp.Connection, error) {
+func (r *Rabbit) Connection() (*amqp.Connection, error) {
 	connectionString := r.GetStringConnection()
 	con, err := amqp.Dial(connectionString)
 	if err != nil {
@@ -42,7 +34,7 @@ func (r Rabbit) Connection() (*amqp.Connection, error) {
 	return con, nil
 }
 
-func (r Rabbit) TestConnection() (bool, error) {
+func (r *Rabbit) TestConnection() (bool, error) {
 	_, err := amqp.Dial(r.GetStringConnection())
 	if err != nil {
 		return false, fmt.Errorf("erro na conexão: %v", err)
@@ -50,16 +42,18 @@ func (r Rabbit) TestConnection() (bool, error) {
 	return true, nil
 }
 
-func (r Rabbit) SendMessage(message interface{}, queue string, con *amqp.Connection) bool {
+func (r *Rabbit) SendMessage(message interface{}, queue string, con *amqp.Connection) error {
 	jobJSON, err := json.Marshal(message)
 	if err != nil {
-		log.Fatalf("Error in converting Job to JSON: %s", err)
+		logger.Log.Errorf("Error al serializar json: %v", err)
+		return err
 	}
 	defer con.Close()
 
 	ch, err := con.Channel()
 	if err != nil {
-		log.Fatalf("Channel error: %s", err)
+		logger.Log.Error(err.Error())
+		return err
 	}
 	defer ch.Close()
 
@@ -73,7 +67,8 @@ func (r Rabbit) SendMessage(message interface{}, queue string, con *amqp.Connect
 		nil,
 	)
 	if err != nil {
-		log.Fatalf("Failed to declare queue: %s", err)
+		logger.Log.Error(err.Error())
+		return err
 	}
 
 	err = ch.Publish(
@@ -88,15 +83,16 @@ func (r Rabbit) SendMessage(message interface{}, queue string, con *amqp.Connect
 		},
 	)
 	if err != nil {
-		log.Fatalf("Erro ao enviar mensagem: %s", err)
+		logger.Log.Error(err.Error())
+		return err
 	}
 	logger.Log.Info("Send message with successfull!")
 	logger.Log.Info("Message:")
 	logger.Log.Info(message)
 
-	return true
+	return nil
 }
 
-func (r Rabbit) GetStringConnection() string {
+func (r *Rabbit) GetStringConnection() string {
 	return "amqp://" + r.User + ":" + r.Password + "@" + r.Host + ":" + strconv.Itoa(int(r.Port)) + "/"
 }

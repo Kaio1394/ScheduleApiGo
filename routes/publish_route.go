@@ -2,7 +2,8 @@ package routes
 
 import (
 	"ScheduleApiGo/controllers"
-
+	"ScheduleApiGo/helper"
+	"ScheduleApiGo/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,5 +22,13 @@ import (
 // @Failure 400 {object} map[string]interface{} "Error response"
 // @Router /consumer/start [post]
 func RegisterPublishJobRoute(r *gin.Engine) {
-	r.POST("/publish/job", controllers.Publish)
+	//configs, err := viper.ConfigSet()
+	//if err != nil {
+	//	logger.Log.Error(err.Error())
+	//	return
+	//}
+	rabbit := helper.Rabbit{}
+	publishService := service.NewPublishService(&rabbit)
+	publishController := controllers.NewPublishController(publishService)
+	r.POST("/publish/job", publishController.Publish)
 }

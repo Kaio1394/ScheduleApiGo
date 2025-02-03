@@ -29,3 +29,12 @@ func (r *ServerRepository) Create(ctx context.Context, tag string, ip string) (i
 
 	return server.Id, nil
 }
+
+func (r *ServerRepository) GetServers(ctx context.Context) ([]model.Server, error) {
+	var servers []model.Server
+	if err := r.db.WithContext(ctx).Find(&servers).Error; err != nil {
+		logger.Log.Error("Error fetching jobs: " + err.Error())
+		return nil, err
+	}
+	return servers, nil
+}

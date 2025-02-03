@@ -34,3 +34,12 @@ func (sc *ServerController) CreateServer(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"id": id})
 }
+func (sc *ServerController) GetServers(c *gin.Context) {
+	jobs, err := sc.service.GetServer(context.Background())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch jobs", "message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"jobs": jobs})
+}

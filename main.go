@@ -42,6 +42,6 @@ func main() {
 	routes.RegisterAuthRoutes(r)
 	routes.RegisterServerRoute(r, db)
 	routes.RegisterJobRoutes(r, db)
-
-	r.Run(":" + configs.Port)
+	//routes.RegisterPublishJobRoute(r)
+	r.Run(":" + configs.Server.Port)
 }
