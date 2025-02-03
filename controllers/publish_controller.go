@@ -1,17 +1,30 @@
 package controllers
 
 import (
+	"ScheduleApiGo/config"
 	"ScheduleApiGo/helper"
 	"ScheduleApiGo/logger"
 	"ScheduleApiGo/model"
+	"ScheduleApiGo/service"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Publish(c *gin.Context) {
+var (
+	configs config.Config
+)
 
+type PublishController struct {
+	service *service.PublishService
+}
+
+func NewPublishController(service *service.PublishService) *PublishController {
+	return &PublishController{service: service}
+}
+
+func (service *PublishController) Publish(c *gin.Context) {
 	var job model.Job
 	if err := c.ShouldBindJSON(&job); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -43,7 +56,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	var rabbit_config helper.IRabbit
+	var rabbit_config helper.Rabbit
 
 	rabbit_config = helper.Rabbit{}
 

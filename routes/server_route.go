@@ -15,4 +15,5 @@ func RegisterServerRoute(r *gin.Engine, db *gorm.DB) {
 	serverController := controllers.NewServerController(serverService)
 
 	r.POST("/server", serverController.CreateServer)
+	r.GET("/server", serverController.GetServers)
 }

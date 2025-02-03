@@ -1,9 +1,9 @@
 package service
 
 import (
+	"ScheduleApiGo/model"
 	"ScheduleApiGo/repository"
 	"context"
-	"errors"
 )
 
 type ServerService struct {
@@ -15,14 +15,8 @@ func NewServerService(repo *repository.ServerRepository) *ServerService {
 }
 
 func (s *ServerService) CreateServer(ctx context.Context, tag string, ip string) (int, error) {
-	if tag == "" || ip == "" {
-		return 0, errors.New("Tag and IP are required")
-	}
-
-	serverID, err := s.repo.Create(ctx, tag, ip)
-	if err != nil {
-		return 0, err
-	}
-
-	return serverID, nil
+	return s.repo.Create(ctx, tag, ip)
+}
+func (s *ServerService) GetServer(ctx context.Context) ([]model.Server, error) {
+	return s.repo.GetServers(ctx)
 }
