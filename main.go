@@ -39,7 +39,7 @@ func main() {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	routes.RegisterPublishJobRoute(r)
-	routes.RegisterAuthRoutes(r)
+	routes.RegisterAuthRoutes(r, db)
 	routes.RegisterServerRoute(r, db)
 	routes.RegisterJobRoutes(r, db)
 	//routes.RegisterPublishJobRoute(r)

@@ -2,15 +2,15 @@ package service
 
 import (
 	"ScheduleApiGo/model"
-	"ScheduleApiGo/repository"
+	"ScheduleApiGo/repository/job"
 	"context"
 )
 
 type JobService struct {
-	repo *repository.JobRepository
+	repo *job.JobRepositoryImpl
 }
 
-func NewJobService(repo *repository.JobRepository) *JobService {
+func NewJobService(repo *job.JobRepositoryImpl) *JobService {
 	return &JobService{repo: repo}
 }
 

@@ -1,38 +1,35 @@
 package controllers
 
 import (
-	"ScheduleApiGo/logger"
 	"ScheduleApiGo/service"
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-func Auth(c *gin.Context) {
+type AuthController struct {
+	service *service.AuthService
+}
 
-	user := c.GetHeader("user")
-	userId := c.GetHeader("userId")
+func NewAuthController(service *service.AuthService) *AuthController {
+	return &AuthController{service}
+}
 
-	if user == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": "User is required"})
+func (ac *AuthController) Authenticate(c *gin.Context) {
+
+	var loginData struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&loginData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalida date"})
 		return
 	}
-	if userId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": "UserId is required"})
-		return
-	}
-	token, err := service.GenerateJWT(userId, user)
+	token, err := ac.service.Authenticate(loginData.Username, loginData.Password)
 	if err != nil {
-		logger.Log.Error("Erro to generate token: " + err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{
-		"user":      user,
-		"jwt_token": token,
-		"createAt":  time.Now().Format(time.RFC3339),
-	})
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
 }
