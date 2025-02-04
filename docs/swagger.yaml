@@ -1,9 +1,245 @@
 basePath: /
+definitions:
+  model.Job:
+    properties:
+      cmdExecute:
+        example: true
+        type: boolean
+      date:
+        example: "2025-02-04T15:04:05Z"
+        type: string
+      description:
+        example: Daily backup job
+        type: string
+      hold:
+        example: false
+        type: boolean
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Backup Job
+        type: string
+      priority:
+        example: 1
+        type: integer
+      script:
+        example: backup.sh
+        type: string
+      serverId:
+        example: 2
+        type: integer
+    type: object
+  model.Server:
+    properties:
+      id:
+        type: integer
+      ip:
+        type: string
+      tag:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
   description: This is a sample API to demonstrate Swagger with Gin.
   title: ScheduleApiGo
   version: "1.0"
-paths: {}
+paths:
+  /consumer/start:
+    post:
+      consumes:
+      - application/json
+      description: Publishes a job message to RabbitMQ with connection parameters
+      parameters:
+      - description: RabbitMQ host
+        in: header
+        name: host
+        required: true
+        type: string
+      - description: RabbitMQ port
+        in: header
+        name: port
+        required: true
+        type: string
+      - description: RabbitMQ user
+        in: header
+        name: user
+        required: true
+        type: string
+      - description: RabbitMQ password
+        in: header
+        name: password
+        required: true
+        type: string
+      - description: RabbitMQ queue
+        in: query
+        name: queue
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Consumer success
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Error response
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Consume a job
+      tags:
+      - Consume
+  /job:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a job by its ID from the database
+      parameters:
+      - description: Job ID
+        in: header
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Job'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get job by ID
+      tags:
+      - job
+    post:
+      consumes:
+      - application/json
+      description: Add a new job to the database
+      parameters:
+      - description: Job data
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/model.Job'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new job
+      tags:
+      - job
+  /job/list:
+    get:
+      description: Return a list of jobs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Job'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List of jobs
+      tags:
+      - job
+  /server:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Server'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: list of servers
+      tags:
+      - server
+    post:
+      consumes:
+      - application/json
+      description: Add a new Server to database
+      parameters:
+      - description: Object Data
+        in: body
+        name: server
+        required: true
+        schema:
+          $ref: '#/definitions/model.Server'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Server'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new server
+      tags:
+      - server
 swagger: "2.0"

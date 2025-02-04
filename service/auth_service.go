@@ -5,9 +5,10 @@ import (
 	"ScheduleApiGo/model"
 	"ScheduleApiGo/repository/auth"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"os"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -39,6 +40,22 @@ func (service *AuthService) GenerateJWT(user *model.User) (string, error) {
 	return token.SignedString(getSecretKey())
 }
 
+func (service *AuthService) ValidateJWT(tokenString string) (*jwt.Token, error) {
+	secretKey := getSecretKey()
+	if secretKey == nil {
+		return nil, fmt.Errorf("missing secret key")
+	}
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if token.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return secretKey, nil
+	})
+
+	return token, err
+}
+
 func (service *AuthService) VerifyPassword(providedPassword, storedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(providedPassword))
 	return err == nil
@@ -50,7 +67,7 @@ func (service *AuthService) Authenticate(username, password string) (string, err
 		return "", err
 	}
 
-	if !service.VerifyPassword(password, user.Password) {
+	if password != user.Password {
 		return "", fmt.Errorf("Password invalid.")
 	}
 

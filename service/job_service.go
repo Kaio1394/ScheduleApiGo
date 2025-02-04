@@ -21,3 +21,7 @@ func (s *JobService) CreateJob(ctx context.Context, job *model.Job) (int, error)
 func (s *JobService) GetJobs(ctx context.Context) ([]model.Job, error) {
 	return s.repo.GetJobs(ctx)
 }
+
+func (s *JobService) GetJobById(ctx context.Context, id int) (*model.Job, error) {
+	return s.repo.GetJobById(ctx, id)
+}

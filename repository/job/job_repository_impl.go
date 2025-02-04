@@ -4,7 +4,6 @@ import (
 	"ScheduleApiGo/logger"
 	"ScheduleApiGo/model"
 	"context"
-
 	"gorm.io/gorm"
 )
 
@@ -31,4 +30,12 @@ func (r *JobRepositoryImpl) GetJobs(ctx context.Context) ([]model.Job, error) {
 		return nil, err
 	}
 	return jobs, nil
+}
+
+func (r *JobRepositoryImpl) GetJobById(ctx context.Context, id int) (*model.Job, error) {
+	var job model.Job
+	if err := r.db.WithContext(ctx).First(&job, id).Error; err != nil {
+		return nil, err
+	}
+	return &job, nil
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"ScheduleApiGo/model"
+
 	"gorm.io/gorm"
 )
 
@@ -10,7 +11,7 @@ type AuthRepositoryImpl struct {
 }
 
 func NewAuthRepository(db *gorm.DB) *AuthRepositoryImpl {
-	return &AuthRepositoryImpl{}
+	return &AuthRepositoryImpl{db: db}
 }
 
 func (a AuthRepositoryImpl) FindByUsername(username string) (*model.User, error) {
