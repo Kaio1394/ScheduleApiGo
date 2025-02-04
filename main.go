@@ -2,6 +2,7 @@ package main
 
 import (
 	"ScheduleApiGo/database"
+	_ "ScheduleApiGo/docs"
 	"ScheduleApiGo/logger"
 	"ScheduleApiGo/routes"
 	"ScheduleApiGo/viper"
@@ -18,7 +19,6 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
-
 	db, err := database.ConnectDatabase()
 	if err != nil {
 		return

@@ -15,5 +15,6 @@ func RegisterJobRoutes(r *gin.Engine, db *gorm.DB) {
 	jobController := controllers.NewJobController(jobService)
 
 	r.POST("/job", jobController.CreateJob)
+	r.GET("/job", jobController.GetJobById)
 	r.GET("/job/list", jobController.GetJobs)
 }
