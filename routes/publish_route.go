@@ -3,8 +3,10 @@ package routes
 import (
 	"ScheduleApiGo/controllers"
 	"ScheduleApiGo/helper"
+	"ScheduleApiGo/repository/job"
 	"ScheduleApiGo/service"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // Consume jobs of RabbitMQ
@@ -21,7 +23,7 @@ import (
 // @Success 201 {object} map[string]string "Consumer success"
 // @Failure 400 {object} map[string]interface{} "Error response"
 // @Router /consumer/start [post]
-func RegisterPublishJobRoute(r *gin.Engine) {
+func RegisterPublishJobRoute(r *gin.Engine, db *gorm.DB) {
 	//configs, err := viper.ConfigSet()
 	//if err != nil {
 	//	logger.Log.Error(err.Error())
@@ -29,6 +31,8 @@ func RegisterPublishJobRoute(r *gin.Engine) {
 	//}
 	rabbit := helper.Rabbit{}
 	publishService := service.NewPublishService(&rabbit)
-	publishController := controllers.NewPublishController(publishService)
+	repoJob := job.NewJobRepository(db)
+	jobService := service.NewJobService(repoJob)
+	publishController := controllers.NewPublishController(publishService, jobService)
 	r.POST("/publish/job", publishController.Publish)
 }
