@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"ScheduleApiGo/config"
 	"ScheduleApiGo/enums"
 	"ScheduleApiGo/helper"
 	"ScheduleApiGo/logger"
@@ -13,10 +12,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-)
-
-var (
-	configs config.Config
 )
 
 type PublishController struct {
@@ -109,7 +104,12 @@ func (s *PublishController) Publish(c *gin.Context) {
 		return
 	}
 
-	rabbit_config.SendMessage(job, queue, con)
+	err = rabbit_config.SendMessage(job, queue, con)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "SendMessage error.",
+		})
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Publish Job.",
