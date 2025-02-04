@@ -2,12 +2,15 @@ package controllers
 
 import (
 	"ScheduleApiGo/config"
+	"ScheduleApiGo/enums"
 	"ScheduleApiGo/helper"
 	"ScheduleApiGo/logger"
 	"ScheduleApiGo/model"
 	"ScheduleApiGo/service"
+	"context"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,19 +20,24 @@ var (
 )
 
 type PublishController struct {
-	service *service.PublishService
+	sp *service.PublishService
+	js *service.JobService
 }
 
-func NewPublishController(service *service.PublishService) *PublishController {
-	return &PublishController{service: service}
+func NewPublishController(service *service.PublishService, js *service.JobService) *PublishController {
+	return &PublishController{sp: service, js: js}
 }
 
-func (service *PublishController) Publish(c *gin.Context) {
-	var job model.Job
-	if err := c.ShouldBindJSON(&job); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+func (s *PublishController) Publish(c *gin.Context) {
+
+	jobId, err := strconv.Atoi(c.GetHeader("JobId"))
+	if err != nil {
+		logger.Log.Error(err)
+		return
+	}
+	job, err := s.js.GetJobById(context.Background(), jobId)
+	if err != nil {
+		logger.Log.Errorf("get job by id err: %v", err)
 		return
 	}
 
@@ -53,6 +61,22 @@ func (service *PublishController) Publish(c *gin.Context) {
 			"error": "Invalid port parameter.",
 		})
 		logger.Log.Error("Invalid port parameter.")
+		return
+	}
+
+	var jobHistory = model.HistoryExecution{
+		JobId:    job.Id,
+		Status:   enums.Running.String(),
+		ServerId: job.ServerId,
+		CreateAt: time.Now(),
+	}
+
+	err = s.js.SaveToTableHistoryExecution(context.Background(), jobHistory)
+	if err != nil {
+		logger.Log.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -92,4 +116,17 @@ func (service *PublishController) Publish(c *gin.Context) {
 		"job":     job,
 	})
 	logger.Log.Info("Sended message to queue Job.Schedule.Test")
+
+	jobHistory.Status = enums.Completed.String()
+	jobHistory.CreateAt = time.Now()
+
+	err = s.js.SaveToTableHistoryExecution(context.Background(), jobHistory)
+	if err != nil {
+		logger.Log.Error(err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Publish Job.",
+		"job":     job,
+	})
 }

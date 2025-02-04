@@ -10,8 +10,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-var queue_history string = "Job.Schedule.History"
-
 type Rabbit struct {
 	User     string
 	Password string

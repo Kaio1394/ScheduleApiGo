@@ -25,3 +25,6 @@ func (s *JobService) GetJobs(ctx context.Context) ([]model.Job, error) {
 func (s *JobService) GetJobById(ctx context.Context, id int) (*model.Job, error) {
 	return s.repo.GetJobById(ctx, id)
 }
+func (s *JobService) SaveToTableHistoryExecution(ctx context.Context, jobHistory model.HistoryExecution) error {
+	return s.repo.SendJobToTableHistory(ctx, jobHistory)
+}

@@ -39,3 +39,11 @@ func (r *JobRepositoryImpl) GetJobById(ctx context.Context, id int) (*model.Job,
 	}
 	return &job, nil
 }
+
+func (r *JobRepositoryImpl) SendJobToTableHistory(ctx context.Context, jobHistoryExecution model.HistoryExecution) error {
+	if err := r.db.WithContext(ctx).Create(&jobHistoryExecution).Error; err != nil {
+		logger.Log.Error("Error to insert to history execution: " + err.Error())
+		return err
+	}
+	return nil
+}

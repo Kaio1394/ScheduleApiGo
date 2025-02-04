@@ -33,7 +33,7 @@ func ConnectDatabase() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := db.AutoMigrate(&model.Job{}, &model.Server{}, &model.User{}); err != nil {
+	if err := db.AutoMigrate(&model.Job{}, &model.Server{}, &model.User{}, &model.HistoryExecution{}); err != nil {
 		logger.Log.Error("Error running migration: ", err)
 	}
 
